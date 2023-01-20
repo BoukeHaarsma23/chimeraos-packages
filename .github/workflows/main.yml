@@ -25,7 +25,7 @@ jobs:
       uses: actions/checkout@v3
     - name: Makepkg Build and Check
       id: makepkg
-      uses: boukehaarsma23/pkgbuild-action@master
+      uses: boukehaarsma23/pkgbuild-action@v2.0.0
       with:
         pkgdir: ${{ matrix.pkgbuild_dir }}
         namcapDisable: yes
