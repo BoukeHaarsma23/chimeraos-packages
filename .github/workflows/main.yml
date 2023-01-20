@@ -33,19 +33,3 @@ jobs:
     - name: Move package
       run: |
         mv -v ${{ matrix.pkgbuild_dir }}/*.pkg.tar.zst output/
-  create-release:
-    needs: pkgbuild
-    runs-on: ubuntu-latest
-    name: Create release
-    id: create_release
-    uses: softprops/action-gh-release@v1
-    with:
-      token: ${{ secrets.GITHUB_TOKEN }}
-      tag_name: ${{ steps.build_image.outputs.version }}
-      name: Packages ${{ github.sha }}
-      draft: false
-      prerelease: true
-      files: |
-        output/${{ steps.build_image.outputs.image_filename }}
-        output/build_info.txt
-        output/sha256sum.txt
