@@ -4,6 +4,7 @@ on:
     branches:
     - 'master'
 jobs:
+  # create json so pkgbuilds can be run in parrallel.
   list-pkgbuilds:
     runs-on: ubuntu-latest
     outputs:
@@ -12,6 +13,7 @@ jobs:
       - uses: actions/checkout@v3
       - id: set-matrix
         run: echo "matrix=$(ls -d pkg/* | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+
   pkgbuild:
     needs: list-pkgbuilds
     name: Build package
@@ -30,8 +32,27 @@ jobs:
         pkgdir: ${{ matrix.pkgbuild_dir }}
         namcapDisable: yes
         aurDeps: yes
+    # remove any epoch (:) in name, replace with --
+    - name: remove epoch in name
+      run: 
+        find ${{ matrix.pkgbuild_dir }}/*.pkg.tar.zst -type f -name '*:*' -execdir bash -c 'mv "$1" "${1//:/--}"' bash {} \;
     - name: Upload Package Archives
       uses: actions/upload-artifact@v3
       with:
           name: custom-packages
           path: ${{ matrix.pkgbuild_dir }}/*.pkg.tar*
+
+  build:
+    needs: pkgbuild
+    name: View images
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - uses: actions/download-artifact@v3
+      with:
+          name: custom-packages
+          path: pkgs/
+    - name: Display structure of downloaded files
+      run: ls -R
+      working-directory: pkgs/
