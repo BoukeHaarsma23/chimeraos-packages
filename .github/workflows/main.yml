@@ -1,0 +1,32 @@
+name: Build all packages
+on:
+  push:
+    branches:
+    - 'master'
+jobs:
+  list-pkgbuilds:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: set-matrix
+        run: echo "matrix=$(ls -d pkgs/* | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+  pkgbuild:
+    needs: list-pkgbuilds
+    name: Build package
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        pkgbuild_dir: ${{ fromJson(needs.list-pkgbuilds.outputs.matrix) }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Makepkg Build and Check
+      id: makepkg
+      uses: boukehaarsma23/pkgbuild-action@master
+      with:
+        pkgdir: ${{ matrix.pkgbuild_dir }}
+        namcapDisable: yes
+        aurDeps: yes
