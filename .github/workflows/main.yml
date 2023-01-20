@@ -34,4 +34,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
           name: custom-packages
-          path: ${{ matrix.pkgbuild_dir }}/*.pkg.tar.zst
+          path: ${{ matrix.pkgbuild_dir }}/*.pkg.tar*
