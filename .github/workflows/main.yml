@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - id: set-matrix
-        run: echo "matrix=$(ls -d pkgs/* | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+        run: echo "matrix=$(ls -d * | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
   pkgbuild:
     needs: list-pkgbuilds
     name: Build package
@@ -30,3 +30,17 @@ jobs:
         pkgdir: ${{ matrix.pkgbuild_dir }}
         namcapDisable: yes
         aurDeps: yes
+  create-release:
+    - name: Create release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag_name: ${{ steps.build_image.outputs.version }}
+        name: Packages ${{ github.sha }}
+        draft: false
+        prerelease: true
+        files: |
+          output/${{ steps.build_image.outputs.image_filename }}
+          output/build_info.txt
+          output/sha256sum.txt
