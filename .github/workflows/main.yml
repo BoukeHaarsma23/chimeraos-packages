@@ -30,6 +30,8 @@ jobs:
         pkgdir: ${{ matrix.pkgbuild_dir }}
         namcapDisable: yes
         aurDeps: yes
-    - name: Move package
-      run: |
-        mv -v ${{ matrix.pkgbuild_dir }}/*.pkg.tar.zst output/
+    - name: Upload Package Archives
+      uses: actions/upload-artifact@v3
+      with:
+          name: custom-packages
+          path: ${{ matrix.pkgbuild_dir }}/*.pkg.tar.zst
