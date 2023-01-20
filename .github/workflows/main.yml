@@ -31,7 +31,6 @@ jobs:
       with:
         pkgdir: ${{ matrix.pkgbuild_dir }}
         namcapDisable: yes
-        aurDeps: yes
     # remove any epoch (:) in name, replace with --
     - name: remove epoch in name
       run: 
